@@ -5,6 +5,7 @@ import { ptBR } from 'date-fns/locale';
 
 import { Header } from "../../components/Header";
 import { Loading } from "../../components/Loading";
+import { AlertModal } from "../../components/AlertModal";
 import { PlantCardSecundary } from "../../components/PlantCardSecundary";
 
 import { getPlant, removePlant } from "../../services/asyncStorage";
@@ -17,10 +18,30 @@ export const MyPlants: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [nextWatered, setNextWatered] = useState<string>('');
 
-  const handleRemovePlant = async (plant: IPlant): Promise<void> => {
-    // Criar um modal de alerta.
-    await removePlant(String(plant.id));
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [removeTitle, setRemoveTitle] = useState<string>('');
+  const [removeText, setRemoveText] = useState<string>('');
+  const [targetPlant, setTargetPlant] = useState<string>('');
 
+  const removeMessage = (
+    title: string, 
+    text?: string,
+  ) => {
+    setRemoveTitle(title);
+    setRemoveText(text || '');
+    setIsVisible(true);
+  }
+
+  const handleQuestionRemovePlant = async (plant: IPlant): Promise<void> => {
+    setTargetPlant(String(plant.id));
+    removeMessage(
+      "Aviso 😢",
+      "Deseja realmente deletar essa planta cadastrado?"
+    );
+  }
+
+  const handleRemovePlant = async () => {
+    await removePlant(targetPlant);
   }
 
   useEffect(() => {
@@ -28,17 +49,20 @@ export const MyPlants: FC = () => {
       setLoading(true);
       const plants = await getPlant();
 
-      const nextTime = formatDistance(
-        new Date(plants[0].dateTimeNotification).getTime(),
-        new Date().getTime(),
-        { locale: ptBR }
-      );
-
-      setNextWatered(
-        `Não esqueça de regar a ${plants[0].name} à ${nextTime} horas.`
-      )
-
-      setPlants(plants);
+      if (plants.length > 0) {
+        const nextTime = formatDistance(
+          new Date(plants[0].dateTimeNotification).getTime(),
+          new Date().getTime(),
+          { locale: ptBR }
+        );
+  
+        setNextWatered(
+          `Não esqueça de regar a ${plants[0].name} à ${nextTime} horas.`
+        )
+  
+        setPlants(plants);
+        setLoading(false);
+      }
       setLoading(false);
     }
 
@@ -50,42 +74,68 @@ export const MyPlants: FC = () => {
   }
 
   return (
-    <ScrollView
-    showsVerticalScrollIndicator={false}
-    >
-    <View style={styles.container}>
-      <Header 
-        textLight="Minhas" 
-        textStrong="Plantinhas"
+    <>
+      <AlertModal 
+        isVisible={isVisible}
+        headerTitle={removeTitle}
+        contentText={removeText}
+        onDismiss={() => setIsVisible(false)}
+        cancelText="Cancelar"
+        onCancel={() => setIsVisible(false)}
+        okText="Sim"
+        onOk={handleRemovePlant}
       />
 
-      <View style={styles.spotlight}>
-        <Image 
-          source={require('../../assets/waterdrop.png')}
-          style={styles.spotlightImg}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{
+        }}
+        contentContainerStyle={{
+          // flex: 1
+        }}
+      >
+      <View style={styles.container}>
+        <Header 
+          textLight="Minhas" 
+          textStrong="Plantinhas"
         />
-        <Text style={styles.spotlightText}>{nextWatered}</Text>
-      </View>
 
-      <View style={styles.plants}>
-        <Text style={styles.plantTitle}>Próximas regadas</Text>
+        <View style={styles.spotlight}>
+          <Image 
+            source={require('../../assets/waterdrop.png')}
+            style={styles.spotlightImg}
+          />
+          <Text style={styles.spotlightText}>{nextWatered}</Text>
+        </View>
 
-        <FlatList 
-          data={plants}
-          keyExtractor={(item) => String(item.id)}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            flex: 1
-          }}
-          renderItem={({ item }) => (
+        <View style={styles.plants}>
+          <Text style={styles.plantTitle}>Próximas regadas</Text>
+
+          {plants.map(plant => (
             <PlantCardSecundary 
-              data={item} 
-              handleRemove={() => handleRemovePlant(item)}
+              key={plant.id}
+              data={plant} 
+              handleRemove={() => handleQuestionRemovePlant(plant)}
             />
-          )}
-        />
+          ))}
+
+          {/* <FlatList 
+            data={plants}
+            keyExtractor={(item) => String(item.id)}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              flex: 1
+            }}
+            renderItem={({ item }) => (
+              <PlantCardSecundary 
+                data={item} 
+                handleRemove={() => handleQuestionRemovePlant(item)}
+              />
+            )}
+          /> */}
+        </View>
       </View>
-    </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }

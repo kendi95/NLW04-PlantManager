@@ -32,7 +32,7 @@ export const PlantCardSecundary: FC<PlantCardSecundaryProps> = ({
               style={styles.buttonRemove}
               onPress={handleRemove}
             >
-              <Feather name="trash" size={32} color={colors.white} />
+              <Feather name="trash" size={24} color={colors.white} />
             </RectButton>
           </View>
         </Animated.View>

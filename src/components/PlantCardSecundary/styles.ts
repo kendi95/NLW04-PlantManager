@@ -21,7 +21,8 @@ export const styles = StyleSheet.create({
     color: colors.heading
   },
   details: {
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
+    marginRight: 8
   },
   timeLabel: {
     fontSize: 16,
@@ -29,7 +30,6 @@ export const styles = StyleSheet.create({
     color: colors.body_light
   },
   time: {
-    marginTop: 5,
     fontSize: 16,
     fontFamily: fonts.heading,
     color: colors.body_dark

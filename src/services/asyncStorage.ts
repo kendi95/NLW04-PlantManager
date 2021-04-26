@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { 
   scheduleNotificationAsync,
   cancelScheduledNotificationAsync, 
@@ -21,17 +21,18 @@ export const savePlant = async (plant: IPlant): Promise<void> => {
 
   if (repeat_every === 'week') {
     const interval = Math.trunc(7 / times);
-    nextTime.setDate(now.getTime() + interval);
+    nextTime.setTime(now.getTime() + interval);
   }
 
   if (repeat_every === 'day') {
-    nextTime.setDate(nextTime.getTime() + 1);
+    nextTime.setTime(nextTime.getTime() + 1);
   }
-
+  
   const seconds = Math.abs(
     Math.ceil((now.getTime() - nextTime.getTime()) / 1000)
   );
 
+    
   const notificationId = await scheduleNotificationAsync({
     content: {
       title: "Heeeyy,  🌱",
@@ -62,6 +63,7 @@ export const savePlant = async (plant: IPlant): Promise<void> => {
       ...newPlant,
       ...oldPlants
     }));
+
 }
 
 export const getByName = async (): Promise<{name: string | null}> => {
@@ -77,7 +79,7 @@ export const getByName = async (): Promise<{name: string | null}> => {
 export const getPlant = async (): Promise<IPlant[]> => {
   const data = await AsyncStorage.getItem('@plant_manager/plants');
   const plants = data ? (JSON.parse(data) as IStoragePlant) : {};
-  
+
   const plantSorted = Object
     .keys(plants)
     .map(plant => {

@@ -10,10 +10,23 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.shape,
   },
+  backButtonContainer: {
+    marginTop: 48,
+    marginLeft: 18,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   plantInfo: {
     flex: 1,
-    paddingHorizontal: 30,
-    paddingVertical: 50,
+    marginTop: "-24%",
+    zIndex: -1,
+    paddingHorizontal: 32,
+    // paddingVertical: 25,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.shape
@@ -22,14 +35,14 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.heading,
     fontSize: 24,
     color: colors.heading,
-    marginTop: 15,
+    marginTop: 8,
   },
   plantAbout: {
     textAlign: 'center',
     fontFamily: fonts.text,
     color: colors.heading,
-    fontSize: 17,
-    marginTop: 10
+    fontSize: 16,
+    marginTop: 8
   },
   controller: {
     backgroundColor: colors.white,
